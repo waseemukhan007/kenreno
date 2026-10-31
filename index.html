@@ -80,6 +80,21 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .kpi.hero{background:var(--accent-soft);border-color:transparent}
 .kpi.hero .v{color:var(--accent)}
 .kpi .v.good{color:var(--good)} .kpi .v.bad{color:var(--bad)}
+.secsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.sc{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--sc,var(--accent));border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.sc:hover{border-color:var(--sc,var(--accent))}
+.sc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sc-t{font-family:var(--display,inherit);font-weight:700;font-size:17px}
+.sc-n{font-size:12px;color:var(--muted);white-space:nowrap}
+.sc-d{font-size:12px;color:var(--muted);margin-top:-6px}
+.sc-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sc-g .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:18px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-g .v.good{color:var(--good)} .sc-g .v.bad{color:var(--bad)} .sc-g .v.muted{color:var(--muted)}
+.sc-g .s{font-size:11px;color:var(--muted)}
+.sc-bar{height:6px;border-radius:3px;background:var(--bg);overflow:hidden}.sc-bar span{display:block;height:100%;background:var(--sc,var(--accent))}
+.sc-f{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--muted);align-items:center}
+.sc-f .pill{margin:0}
+.sc.open{border-top-style:dashed}
 .meter{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:4px}
 .meter span{display:block;height:100%;background:var(--accent)}
 .meter span.over{background:var(--bad)}
@@ -184,6 +199,7 @@ tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoratio
   .field input[type=number]{width:130px}
   .field input,.field select{font-size:16px;min-height:40px}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .secsum{grid-template-columns:1fr;gap:8px}.sc{padding:12px 14px}.sc-g .v{font-size:16px}
   .kpi{padding:10px 12px}
   .kpi .v{font-size:19px}
   .cat{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}
@@ -329,6 +345,7 @@ tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoratio
   </section>
 
   <section class="kpis" id="kpis" aria-label="Summary"></section>
+  <section class="secsum" id="secsum" aria-label="Summary by section"></section>
 
   <div class="grid2">
     <section class="panel" aria-labelledby="catH">
@@ -422,8 +439,36 @@ tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoratio
       {l:"Not doing",v:fmt(gross(T.cut+T.cancelled)),d:(T.nCut+T.nCancel)?`${T.nCut+T.nCancel} line${T.nCut+T.nCancel>1?"s":""} cancelled (blank target or unticked)`:"Clear a target to cancel a line",cls:(T.cut+T.cancelled)?"good":""},
       {l:"Paid to date",v:fmt(T.p),d:T.committed?`${fmt(Math.max(0,gross(T.committed)-T.p))} still owed on committed work`:"Nothing committed yet"},
     ];
+    renderSecSum(T);
     $("kpis").innerHTML=k.map(x=>`<div class="kpi${x.hero?" hero":""}"><span class="label">${x.l}</span><span class="v ${x.cls||""}" title="${esc(x.v)}">${x.v}</span><span class="d">${x.d}</span>${x.meter!=null?`<div class="meter"><span class="${x.over?"over":""}" style="width:${x.meter}%"></span></div>`:""}</div>`).join("");
   }
+
+  function renderSecSum(ALL){
+    const COL={"GC":"var(--accent)","Owner supply":"var(--lumber)","Not quoted yet":"var(--warn)"};
+    const keys=[...new Set(items.map(i=>(i.trade||"Other").trim()||"Other"))].sort((a,b)=>{const x=SECTION_ORDER.indexOf(a),y=SECTION_ORDER.indexOf(b);return (x<0?99:x)-(y<0?99:y)});
+    const allT=ALL.t||1;
+    $("secsum").innerHTML=keys.map(k=>{
+      const L=items.filter(i=>((i.trade||"Other").trim()||"Other")===k);
+      const T=totals(L);
+      const live=L.filter(i=>i.include!==false&&!isCancel(i));
+      const unpriced=live.filter(i=>!num(i.quoted)&&!num(i.target)&&!num(i.actual)).length;
+      const cnt=s=>live.filter(i=>(i.status||"Quoted")===s).length;
+      const share=Math.round(T.t/allT*100);
+      const pills=[["Agreed","good"],["Negotiate","warn"],["In progress","warn"],["Done","good"],["Quoted","neutral"]].map(([s,c])=>{const n=cnt(s);return n?`<span class="pill ${c}">${n} ${s.toLowerCase()}</span>`:""}).join("");
+      const open=k==="Not quoted yet"||(!T.q&&!T.t);
+      return `<button type="button" class="sc${open?" open":""}" data-sec="${esc(k)}" style="--sc:${COL[k]||"var(--muted)"}" aria-label="Jump to ${esc(SECTION_LABEL[k]||k)} lines">
+        <div class="sc-h"><span class="sc-t">${esc(SECTION_LABEL[k]||k)}</span><span class="sc-n">${L.length} line${L.length===1?"":"s"}</span></div>
+        <div class="sc-d">${esc(SECTION_DESC[k]||"")}</div>
+        <div class="sc-g">
+          <div><div class="label">Quoted</div><div class="v">${fmt(T.q)}</div></div>
+          <div><div class="label">Target</div><div class="v">${fmt(T.t)}</div></div>
+          <div><div class="label">Savings</div><div class="v ${T.s>0?"good":T.s<0?"bad":"muted"}">${fmt(T.s)}</div><div class="s">${T.q?(T.s/T.q*100).toFixed(1)+"% off":"—"}</div></div>
+        </div>
+        <div><div class="sc-bar"><span style="width:${Math.max(0,Math.min(100,share))}%"></span></div><div class="s" style="font-size:11px;color:var(--muted);margin-top:4px">${share}% of your total target${T.p?` · ${fmt(T.p)} paid`:""}</div></div>
+        <div class="sc-f">${unpriced?`<span class="pill warn">${unpriced} still need a price</span>`:""}${pills}${(T.nCut+T.nCancel)?`<span class="pill neutral">${T.nCut+T.nCancel} not doing</span>`:""}</div>
+      </button>`}).join("");
+  }
+  $("secsum").addEventListener("click",e=>{const b=e.target.closest("[data-sec]");if(!b)return;const r=document.querySelector(`tr.sec[data-sec="${CSS.escape(b.dataset.sec)}"]`);if(r)r.scrollIntoView({behavior:"smooth",block:"start"})});
 
   function renderGroups(el,key){
     const g={};items.forEach(i=>{const k=(i[key]||"Uncategorized").trim()||"Uncategorized";(g[k]=g[k]||[]).push(i)});
@@ -513,7 +558,7 @@ tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoratio
     let h="";
     Object.keys(groups).sort((a,b)=>rank(a)-rank(b)||a.localeCompare(b)).forEach(k=>{
       const l=groups[k].sort((a,b)=>num(a.order)-num(b.order));const T=totals(l);
-      h+=`<tr class="sec"><td colspan="13"><span class="sec-t">${esc(SECTION_LABEL[k]||k)}</span><span class="sec-d">${esc(SECTION_DESC[k]||"")}</span></td></tr>`;
+      h+=`<tr class="sec" data-sec="${esc(k)}"><td colspan="13"><span class="sec-t">${esc(SECTION_LABEL[k]||k)}</span><span class="sec-d">${esc(SECTION_DESC[k]||"")}</span></td></tr>`;
       h+=l.map(rowHtml).join("");
       h+=`<tr class="newsub"><td class="lbl" colspan="4">${esc(SECTION_LABEL[k]||k)} new subtotal <span class="ns-d">after your targets</span></td><td class="calc ns-was">was ${fmt(T.q)}</td><td class="calc ns-v">${fmt(T.t)}</td>${diffCell(T.q,T.t)}<td colspan="6"></td></tr>`;
       h+=`<tr class="sub"><td class="lbl" colspan="4">${esc(SECTION_LABEL[k]||k)} subtotal</td><td class="calc">${fmt(T.q)}</td><td class="calc">${fmt(T.t)}</td>${diffCell(T.q,T.t)}<td class="calc">${T.a?fmt(T.a):"—"}</td><td class="calc">${T.p?fmt(T.p):"—"}</td><td colspan="3"></td></tr>`;
