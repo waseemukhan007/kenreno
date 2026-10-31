@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0;font:14px/1.45 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>General Contractor Renovation Budget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: site-ledger. Settings strip, KPI row, category bars, then the editable line-item ledger. */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#16202c; --muted:#5b6777; --line:#d7dde5;
+  --accent:#1e3a5f; --accent-soft:#e1e9f3; --lumber:#d4892a; --lumber-soft:#f8ebd8; --brand-ink:#ffffff;
+  --good:#1f7a4d; --warn:#a86a00; --bad:#b3362b; --good-bg:#e2f2e8; --warn-bg:#fbefd6; --bad-bg:#f8e1de;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151c; --surface:#18202b; --ink:#e5ebf2; --muted:#98a4b4; --line:#2a3544;
+  --accent:#8db3e2; --accent-soft:#1b2a3d; --lumber:#e7a34c; --lumber-soft:#3a2b16; --brand-ink:#10151c;
+  --good:#6cd19a; --warn:#e8b14a; --bad:#f08478; --good-bg:#1d3a2a; --warn-bg:#3a2f15; --bad-bg:#422421;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151c; --surface:#18202b; --ink:#e5ebf2; --muted:#98a4b4; --line:#2a3544;
+  --accent:#8db3e2; --accent-soft:#1b2a3d; --lumber:#e7a34c; --lumber-soft:#3a2b16; --brand-ink:#10151c;
+  --good:#6cd19a; --warn:#e8b14a; --bad:#f08478; --good-bg:#1d3a2a; --warn-bg:#3a2f15; --bad-bg:#422421;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45}
+.wrap{max-width:1280px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+.bp-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.bp-tab{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:6px 12px;border-radius:6px;cursor:pointer}
+.bp-tab b{font-family:var(--mono);font-size:11px;color:var(--lumber);margin-right:4px}
+.bp-tab[aria-selected=true]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.bp-tab[aria-selected=true] b{color:var(--lumber)}
+.bp-desc{margin:0;color:var(--muted);font-size:13px}
+.bp-view{overflow:auto;border:1px solid var(--line);border-radius:8px;background:#ffffff;max-height:80vh;cursor:zoom-in}
+.bp-view img{display:block;width:100%;max-width:none;height:auto}
+.bp-view.zoom{cursor:zoom-out}
+.bp-view.zoom img{width:250%}
+.bp-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.bp-foot a{color:var(--accent);font-weight:600}
+.lockbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto}
+.lock-msg{font-size:12px;color:var(--muted)}
+.lock-msg.err{color:var(--bad)}
+.lock-form{display:flex;gap:6px}
+.lock-form input{font:inherit;font-size:16px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:160px}
+.brandbar .btn{padding:6px 12px;font-size:13px}
+@media (max-width:760px){.lockbar{margin-left:0;width:100%}.lock-form{flex:1}.lock-form input{flex:1;width:auto}}
+.brandbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding-bottom:16px;border-bottom:3px solid var(--lumber)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:48px;height:48px;flex:none}
+.brand-t{display:flex;flex-direction:column;line-height:1.15}
+.brand-n{font-family:var(--display);font-stretch:85%;font-weight:800;font-size:20px;color:var(--accent);letter-spacing:.01em}
+.brand-s{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--lumber);font-weight:600}
+.brand-job{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:clamp(26px,4vw,36px);letter-spacing:-.01em;margin:0;line-height:1;text-wrap:balance}
+h2{font-family:var(--display);font-stretch:85%;font-weight:700;font-size:18px;margin:0}
+.sub{color:var(--muted);margin:4px 0 0}
+.status-note{font-size:12px;color:var(--muted)}
+.status-note.err{color:var(--bad)}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.settings{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field input,.field select{font:inherit;font-family:var(--mono);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0}
+.field input[type=number]{width:150px}
+.field.pct input{width:80px}
+.check{display:flex;align-items:center;gap:8px;padding-bottom:8px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:22px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .d{font-size:12px;color:var(--muted)}
+.kpi.hero{background:var(--accent-soft);border-color:transparent}
+.kpi.hero .v{color:var(--accent)}
+.kpi .v.good{color:var(--good)} .kpi .v.bad{color:var(--bad)}
+.meter{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:4px}
+.meter span{display:block;height:100%;background:var(--accent)}
+.meter span.over{background:var(--bad)}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.cats{display:flex;flex-direction:column;gap:10px}
+.cat{display:grid;grid-template-columns:minmax(110px,180px) minmax(0,1fr) auto;gap:10px;align-items:center}
+.cat .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bars{display:flex;flex-direction:column;gap:3px}
+.bar{height:7px;border-radius:2px;min-width:1px}
+.bar.q{background:var(--lumber)} .bar.t{background:var(--accent)} .bar.a{background:var(--good)}
+.cat .s{font-size:12px;text-align:right;white-space:nowrap}
+.empty{color:var(--muted);padding:8px 0}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:4px 10px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn{font:inherit;font-weight:600;border:1px solid var(--accent);background:var(--accent);color:var(--surface);padding:7px 14px;border-radius:6px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:1500px}
+th,td{padding:0;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;padding:9px 8px;background:var(--bg);position:sticky;top:0}
+th.r,td.r{text-align:right}
+td input,td select{font:inherit;width:100%;border:1px solid transparent;background:transparent;color:var(--ink);padding:8px;border-radius:4px}
+td input:hover,td select:hover{border-color:var(--line)}
+td input:focus{background:var(--bg);border-color:var(--accent);outline:none}
+td input.money{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+td.calc{padding:8px;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+tr.sub td{background:var(--bg);font-weight:600}
+tr.newsub td{background:var(--accent-soft);font-weight:700;border-bottom:1px solid var(--line)}
+tr.newsub td.lbl{padding:10px 8px;font-family:var(--display);font-stretch:85%;font-size:16px;color:var(--accent)}
+tr.newsub .ns-d{font-family:var(--body);font-size:11px;font-weight:500;color:var(--muted);margin-left:6px}
+tr.newsub .ns-v{font-size:16px;color:var(--accent)}
+tr.newsub .ns-was{font-size:12px;font-weight:500;color:var(--muted);text-decoration:line-through}
+tr.sec td{padding:16px 10px 8px;border-bottom:2px solid var(--ink);background:var(--surface)}
+.sec-t{font-family:var(--display);font-stretch:85%;font-weight:800;font-size:18px;margin-right:12px}
+.sec-d{color:var(--muted);font-size:12px}
+tr.sub td.lbl{padding:8px;font-family:var(--display);font-stretch:85%;font-size:15px}
+tr.total td{background:var(--lumber-soft);font-weight:700}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.neutral{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.del{font:inherit;background:none;border:none;color:var(--muted);cursor:pointer;padding:6px 10px;font-size:16px}
+.del:hover{color:var(--bad)}
+.confirm{display:flex;gap:4px;padding:4px}
+.confirm button{font:inherit;font-size:12px;border-radius:4px;padding:3px 7px;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.confirm button.yes{background:var(--bad);color:var(--surface);border-color:var(--bad)}
+.c-in{width:40px}.c-diff{width:110px}
+.catcell{display:flex;align-items:center;gap:2px;padding-left:6px}
+.catcell input{min-width:0}
+.cicon{width:16px;height:16px;flex:none;color:var(--accent)}
+.cat .n .cicon{vertical-align:-3px;margin-right:6px}
+.unitbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:0 8px 8px;font-size:12px}
+.unitbar .ul{color:var(--muted)}
+.unitbar input.u{width:48px;padding:4px 6px;font-family:var(--mono);text-align:center;border:1px solid var(--line);background:var(--bg)}
+.unitbar button{font:inherit;font-weight:700;width:22px;height:24px;border:1px solid var(--line);background:var(--bg);color:var(--accent);border-radius:4px;cursor:pointer;padding:0}
+td.diff{padding:6px 8px;text-align:center}
+.dbox{display:inline-block;min-width:80px;padding:5px 8px;border-radius:6px;font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--muted)}
+.dbox.good{background:var(--good-bg);color:var(--good);border-color:transparent}
+input.din{width:112px;text-align:center;cursor:text}
+input.din:hover{border-color:var(--accent)}
+input.din:focus{outline:2px solid var(--accent);outline-offset:1px;background:var(--surface);color:var(--ink)}
+input.din.zero{color:var(--ink)}
+input.din.cancel{font-size:12px;background:var(--bad-bg);color:var(--bad);border-color:transparent}
+input.din.cancel::placeholder{color:var(--bad);opacity:1;font-weight:700}
+tr.cancel td input[data-f="item"],tr.cancel td input[data-f="quoted"]{text-decoration:line-through;color:var(--muted)}
+.dbox.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+td.fair{padding:6px 8px}
+.fr-top{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;white-space:nowrap}
+.fr-track{position:relative;height:8px;margin:6px 0 2px;background:var(--line);border-radius:4px}
+.fr-band{position:absolute;top:0;bottom:0;background:var(--good-bg);border:1px solid var(--good);border-radius:4px}
+.fr-dot{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;border:2px solid var(--surface);background:var(--muted)}
+.fr-dot.bad{background:var(--bad)}.fr-dot.good{background:var(--good)}.fr-dot.warn{background:var(--warn)}
+.fr-tick{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--accent)}
+.fr-basis{font-size:11px;color:var(--muted);white-space:normal}
+.fr-none{color:var(--muted)}.c-trade{width:100px}
+td.in{text-align:center} td.in input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoration:line-through}
+.adj{display:flex;align-items:center}
+.adj button{font:inherit;font-weight:700;width:24px;height:28px;flex:none;border:1px solid var(--line);background:var(--bg);color:var(--accent);border-radius:4px;cursor:pointer;padding:0}
+.adj button:hover{border-color:var(--accent)}
+.adj input{min-width:0}.c-cat{width:200px}.c-item{min-width:340px}.c-m{width:115px} th.c-tgt{width:160px}.c-sav{width:100px}.c-st{width:140px}.c-notes{min-width:200px}.c-x{width:48px}
+.foot{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;max-width:75ch}
+@media (min-width:980px){.grid2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+@media (prefers-reduced-motion:no-preference){.meter span,.bar{transition:width .3s ease}}
+
+@media (max-width:760px){
+  .wrap{gap:16px;padding-block:12px 40px}
+  .brand-s{letter-spacing:.08em}
+  .brand-job{width:100%}
+  .settings{gap:10px 14px;padding:12px}
+  .field input[type=number]{width:130px}
+  .field input,.field select{font-size:16px;min-height:40px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .kpi{padding:10px 12px}
+  .kpi .v{font-size:19px}
+  .cat{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}
+  .cat .n{grid-column:1/-1}
+  .panel{padding:12px}
+  .tools{width:100%}
+  .tools .btn{flex:1 1 auto;text-align:center;min-height:42px}
+  .tablewrap{border:none;background:transparent;overflow:visible;border-radius:0}
+  table{min-width:0;display:block}
+  thead{display:none}
+  tbody{display:block}
+  tr.sec{display:block}
+  tr.sec td{display:block;padding:18px 2px 6px}
+  tr[data-id]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;position:relative}
+  tr[data-id] td{display:flex;flex-direction:column;gap:3px;padding:0;border:none;min-width:0}
+  tr[data-id] td[data-l]::before{content:attr(data-l);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+  tr[data-id] td input,tr[data-id] td select{font-size:16px;min-height:42px;border:1px solid var(--line);background:var(--bg);border-radius:8px}
+  tr[data-id] td.m-trade{display:none}
+  tr[data-id] td.in{position:absolute;top:12px;right:52px;flex-direction:row;align-items:center;gap:6px}
+  tr[data-id] td.in::before{align-self:center}
+  tr[data-id] td.in input{width:22px;height:22px;min-height:0}
+  tr[data-id] td.m-del{position:absolute;top:6px;right:4px}
+  .del{font-size:22px;padding:6px 10px}
+  tr[data-id] td.m-cat{grid-column:1/-1;padding-right:110px}
+  tr[data-id] td.m-cat .catcell{padding-left:0}
+  tr[data-id] td.m-cat input{border-color:transparent;background:transparent;min-height:30px;padding:2px 4px;font-size:13px;color:var(--muted)}
+  tr[data-id] td.m-item{grid-column:1/-1}
+  tr[data-id] td.m-item > input{font-weight:600;font-size:16px}
+  tr[data-id] td.m-notes{grid-column:1/-1}
+  tr[data-id] td.calc{text-align:left;font-size:16px;padding:0;justify-content:flex-start}
+  tr[data-id] td.m-quoted input,tr[data-id] td.m-actual input,tr[data-id] td.m-paid input{text-align:left}
+  .adj{gap:6px}
+  .adj button{width:42px;height:42px;font-size:18px;border-radius:8px}
+  .adj input{text-align:center}
+  td.diff{text-align:left;padding:0}
+  input.din{width:100%;min-height:42px;font-size:16px}
+  .dbox{min-height:42px;display:flex;align-items:center;justify-content:center}
+  .unitbar{padding:8px 0 0;gap:6px}
+  .unitbar button{width:38px;height:38px;font-size:17px}
+  .unitbar input.u{width:60px;min-height:38px}
+  tr.cancel td input[data-f="quoted"]{text-decoration:line-through}
+  tr[data-id] td.m-cat{order:-3} tr[data-id] td.m-item{order:-2}
+  tr[data-id] td.m-quoted{order:1} tr[data-id] td.m-diff{order:2}
+  tr[data-id] td.m-target{order:3;grid-column:1/-1}
+  tr[data-id] td.m-status{order:4;grid-column:1/-1}
+  tr[data-id] td.m-actual{order:5} tr[data-id] td.m-paid{order:6}
+  tr[data-id] td.m-notes{order:7}
+  tr[data-id] td.m-target .adj input{font-size:18px;font-weight:600}
+  tr.off{opacity:.7}
+  tr.sub{display:none}
+  tr.newsub,tr.total{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:12px;border-radius:12px;margin:6px 0 4px}
+  tr.newsub{background:var(--accent-soft)}
+  tr.total{background:var(--lumber-soft);margin-top:16px}
+  tr.newsub td,tr.total td{border:none;background:transparent;padding:0}
+  tr.newsub td.lbl,tr.total td.lbl{width:100%;padding:0}
+  tr.newsub td:empty,tr.total td:empty{display:none}
+  tr.total td:nth-child(n+5){display:none}
+  tr.newsub .ns-v,tr.total td.calc{font-size:18px}
+  .confirm{flex-wrap:wrap}
+  .bp-view{max-height:60vh}
+  .bp-tab{font-size:12px;padding:8px 10px}
+}
+</style>
+
+<script src="vendor/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+/* Shared live storage on Supabase. Replaces the claude.ai database. */
+(function(){
+  var C=window.RENO_CONFIG||{}, PINKEY="kensReno.pin";
+  var ok=C.supabaseUrl&&C.supabaseAnonKey&&C.supabaseUrl.indexOf("PASTE")<0&&window.supabase;
+  function getPin(){try{return localStorage.getItem(PINKEY)||""}catch(e){return ""}}
+  window.renoLive={configured:!!ok,getPin:getPin,
+    setPin:function(p){try{localStorage.setItem(PINKEY,p)}catch(e){}},
+    clearPin:function(){try{localStorage.removeItem(PINKEY)}catch(e){}}};
+  if(!ok){window.claude={use:function(){return Promise.resolve(null)}};return}
+  var sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:false}});
+  window.renoLive.checkPin=function(p){return sb.rpc("reno_check_pin",{p_pin:p}).then(function(r){if(r.error)throw r.error;return !!r.data})};
+  var cache={}, loaded=false, subs=[], loadErr=null;
+  function snapDoc(id,d){return{id:id,exists:!!d,data:function(){return d},metadata:{fromCache:!loaded,hasPendingWrites:false}}}
+  function emit(){subs.forEach(function(f){try{f()}catch(e){console.error(e)}})}
+  function load(){return sb.from("reno_docs").select("path,data").then(function(r){
+      if(r.error){loadErr=r.error;subs.forEach(function(f){f.err&&f.err({code:"unavailable",message:r.error.message})});return}
+      cache={};(r.data||[]).forEach(function(x){cache[x.path]=x.data});loaded=true;emit()})}
+  sb.channel("reno_docs_live").on("postgres_changes",{event:"*",schema:"public",table:"reno_docs"},function(p){
+    if(p.eventType==="DELETE"){var o=p.old&&p.old.path;if(o)delete cache[o]}else if(p.new){cache[p.new.path]=p.new.data}
+    emit()}).subscribe(function(status){if(status==="SUBSCRIBED"&&loaded)load()});
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)load()});
+  load();
+  function put(path,data,merge){
+    if(merge&&cache[path])cache[path]=Object.assign({},cache[path],data);else if(data===null)delete cache[path];else cache[path]=data;
+    setTimeout(emit,0);
+    return sb.rpc("reno_put",{p_pin:getPin(),p_path:path,p_data:data,p_merge:!!merge}).then(function(r){
+      if(r.error){var wrong=/wrong_pin/.test(r.error.message||"");if(wrong)window.renoLive.clearPin();load();
+        throw {code:wrong?"invalid_argument":"unavailable",message:wrong?"Wrong edit passcode":r.error.message}}})}
+  function newId(){return "i"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+  function docRef(path){var id=path.split("/")[1];return{id:id,path:path,
+    get:function(){return Promise.resolve(snapDoc(id,cache[path]))},
+    set:function(d){return put(path,JSON.parse(JSON.stringify(d)),false)},
+    update:function(d){return put(path,JSON.parse(JSON.stringify(d)),true)},
+    delete:function(){return put(path,null,false)},
+    onSnapshot:function(next,err){var f=function(){if(loaded)next(snapDoc(id,cache[path]))};f.err=err;subs.push(f);setTimeout(f,0);return function(){subs=subs.filter(function(x){return x!==f})}}}}
+  var db={doc:docRef,collection:function(c){return{
+    doc:function(id){return docRef(c+"/"+(id||newId()))},
+    onSnapshot:function(next,err){var f=function(){if(!loaded)return;next({docs:Object.keys(cache).filter(function(k){return k.indexOf(c+"/")===0}).map(function(k){return snapDoc(k.slice(c.length+1),cache[k])}),metadata:{fromCache:false,hasPendingWrites:false}})};f.err=err;subs.push(f);setTimeout(f,0);return function(){subs=subs.filter(function(x){return x!==f})}}}}};
+  function download(name,blob){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+  var user={can:function(){return Promise.resolve(!!getPin())},isOwner:function(){return !!getPin()},canEdit:function(){return !!getPin()}};
+  window.claude={use:function(n){return Promise.resolve(n==="db"?db:n==="user"?user:n==="downloads"?{save:function(o){download(o.filename,o.data);return Promise.resolve()}}:null)}};
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+          <rect x="1" y="1" width="46" height="46" rx="10" fill="var(--accent)"/>
+          <path d="M8 24 24 11l16 13" fill="none" stroke="var(--lumber)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 37V22M18 30l9-8M21.5 27.5 29 37" fill="none" stroke="var(--brand-ink)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      <div class="brand-t"><span class="brand-n">Ken’s Renovation Company</span><span class="brand-s">Renovations · Finishing · Carpentry</span></div>
+    </div>
+    <div class="lockbar" id="lockbar">
+      <span id="lockMsg" class="lock-msg"></span>
+      <form id="lockForm" class="lock-form" hidden><input id="lockPin" type="password" autocomplete="current-password" placeholder="Edit passcode" aria-label="Edit passcode"><button class="btn" type="submit">Unlock</button></form>
+      <button class="btn ghost" id="lockBtn" type="button" hidden>Unlock editing</button>
+      <button class="btn ghost" id="lockOut" type="button" hidden>Lock</button>
+    </div>
+    <span class="brand-job">2046 Parklane Cres., Burlington</span>
+  </div>
+  <header>
+    <div>
+      <h1>General Contractor Renovation Budget</h1>
+      <p class="sub">Quoted vs negotiated target vs actual, by trade and category. Edits save automatically and show up live on every phone and computer.</p>
+    </div>
+    <div id="saveState" class="status-note" role="status">Connecting…</div>
+  </header>
+
+  <section class="settings" aria-label="Budget settings">
+    <div class="field"><label class="label" for="setBudget">Total budget (CAD)</label><input id="setBudget" type="number" min="0" step="500" inputmode="decimal" placeholder="e.g. 150000"></div>
+    <div class="field pct"><label class="label" for="setCont">Contingency %</label><input id="setCont" type="number" min="0" max="50" step="1" inputmode="decimal"></div>
+    <div class="field pct"><label class="label" for="setStep">± step ($)</label><input id="setStep" type="number" min="10" step="50" inputmode="decimal"></div>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Summary"></section>
+
+  <div class="grid2">
+    <section class="panel" aria-labelledby="catH">
+      <div class="panel-head"><h2 id="catH">By category</h2>
+        <div class="legend"><span><i style="background:var(--lumber)"></i>Quoted</span><span><i style="background:var(--accent)"></i>Target</span><span><i style="background:var(--good)"></i>Actual</span></div>
+      </div>
+      <div class="cats" id="cats"></div>
+    </section>
+    <section class="panel" aria-labelledby="tradeH">
+      <div class="panel-head"><h2 id="tradeH">By trade</h2></div>
+      <div class="cats" id="trades"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="ledH">
+    <div class="panel-head">
+      <h2 id="ledH">Line items</h2>
+      <div class="tools">
+        <button class="btn" id="addBtn" type="button">Add line</button>
+        <button class="btn ghost" id="csvBtn" type="button" hidden>Export CSV</button>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th class="c-in">In</th><th class="c-trade">Section</th><th class="c-cat">Category</th><th class="c-item">Item / scope</th>
+          <th class="c-m r">Quoted</th><th class="c-tgt r">Target</th><th class="c-diff">Difference</th><th class="c-m r">Actual</th><th class="c-m r">Paid</th>
+          <th class="c-st">Status</th><th class="c-notes">Notes</th><th class="c-x"><span class="label" style="position:absolute;left:-9999px">Delete</span></th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="foot">
+      <span><b>Projected</b> uses Actual where entered, otherwise Target, otherwise Quoted. <b>Leave Target blank</b> to mark a line “Not doing”: it drops out of every total. <b>Difference</b> is Target minus Quoted. Type an amount there to set the target directly: 350 or −350 takes $350 off his quote, +350 goes above it.</span>
+      <span><b>Adjusting:</b> untick <b>In</b> to drop a line from the totals and see what it saves. Use − / + beside Target to move a price by the ± step.</span>
+      <span><b>Contingency</b> is reserved on top of the projected cost. Typical for a GTHA reno of an older home: 10–15%, 15–20% if walls are being opened.</span>
+    </div>
+  </section>
+  <section class="panel" aria-labelledby="bpH" id="blueprint">
+    <div class="panel-head">
+      <h2 id="bpH">House blueprint</h2>
+      <span class="status-note">Pham Design Build · PDB2647 · stamped Sept 28, 2026 · 3/16" = 1'-0"</span>
+    </div>
+    <div class="bp-tabs" role="tablist" aria-label="Drawing sheets"><button type="button" class="bp-tab" role="tab" aria-selected="true" data-i="0"><b>S2</b> Proposed ground floor</button><button type="button" class="bp-tab" role="tab" aria-selected="false" data-i="1"><b>S1</b> Proposed basement</button><button type="button" class="bp-tab" role="tab" aria-selected="false" data-i="2"><b>EX2</b> Existing ground floor</button><button type="button" class="bp-tab" role="tab" aria-selected="false" data-i="3"><b>EX1</b> Existing basement</button><button type="button" class="bp-tab" role="tab" aria-selected="false" data-i="4"><b>EX3</b> Existing second floor</button><button type="button" class="bp-tab" role="tab" aria-selected="false" data-i="5"><b>GN</b> General notes</button></div>
+    <p class="bp-desc" id="bpDesc"></p>
+    <div class="bp-view" id="bpView" title="Click to zoom in or out"><img id="bpImg" alt="" src="blueprint/s2-proposed-ground.jpg"></div>
+    <div class="bp-foot"><span>Click the drawing to zoom, then scroll or drag around it.</span><a id="bpOpen" href="blueprint/s2-proposed-ground.jpg" target="_blank" rel="noopener">Open full size</a></div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const STATUSES=["Quoted","Negotiate","Agreed","In progress","Done"];
+  const STATUS_CLASS={Quoted:"neutral",Negotiate:"warn",Agreed:"good","In progress":"warn",Done:"good"};
+  const HST=0.13;
+  const SECTION_ORDER=["GC","Owner supply","Not quoted yet","Other"];
+  const SECTION_LABEL={"GC":"General contractor","Owner supply":"Owner supply","Not quoted yet":"Not quoted yet"};
+  const SECTION_DESC={"GC":"Labour, plus the materials he supplies","Owner supply":"Materials you buy and hand to the GC","Not quoted yet":"In the drawings or scope, still needs a price"};
+  let items=[]; let settings={budget:0,contingencyPct:12,preTax:true,step:100};
+  let db=null, canWrite=true, filter="All", pendingDelete=null;
+  const $=id=>document.getElementById(id);
+  const fmt=n=>(n<0?"−":"")+"$"+Math.abs(Math.round(n)).toLocaleString("en-CA");
+  const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+  const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const note=(t,err)=>{const el=$("saveState");el.textContent=t;el.classList.toggle("err",!!err)};
+
+  function isCancel(i){return num(i.quoted)>0&&!num(i.target)&&!num(i.actual)}
+  function proj(i){return isCancel(i)?0:(num(i.actual)||num(i.target)||num(i.quoted))}
+  function sav(i){const q=num(i.quoted);if(!q)return 0;return q-(num(i.actual)||num(i.target))}
+  function gross(x){return x}
+
+  function totals(list){
+    return list.reduce((t,i)=>{if(i.include===false){t.cut+=num(i.target)||num(i.quoted);t.nCut++;return t}t.q+=num(i.quoted);if(num(i.fairHigh)&&num(i.quoted)>num(i.fairHigh)){t.over+=num(i.quoted)-num(i.fairHigh);t.nOver++}if(isCancel(i)){t.nCancel++;t.cancelled+=num(i.quoted)}t.t+=num(i.actual)||num(i.target);t.a+=num(i.actual);t.p+=num(i.paid);t.pr+=proj(i);t.s+=sav(i);t.committed+=num(i.actual)||(i.status==="Agreed"||i.status==="In progress"||i.status==="Done"?num(i.target)||num(i.quoted):0);return t},{q:0,t:0,a:0,p:0,pr:0,s:0,committed:0,cut:0,nCut:0,over:0,nOver:0,nCancel:0,cancelled:0});
+  }
+
+  function renderKpis(){
+    const T=totals(items);
+    const cont=T.pr*num(settings.contingencyPct)/100;
+    const need=gross(T.pr+cont);
+    const budget=num(settings.budget);
+    const head=budget-need;
+    const pctUsed=budget?Math.min(100,need/budget*100):0;
+    const tax="";
+    const k=[
+      {l:"Budget",v:budget?fmt(budget):"Not set",d:budget?`${Math.round(need/budget*100)}% allocated`:"Enter your ceiling above",meter:budget?pctUsed:null,over:need>budget},
+      {l:"Total quoted",v:fmt(gross(T.q)),d:`${items.filter(i=>num(i.quoted)).length} priced lines${tax}`},
+      {l:"Negotiated target",v:fmt(gross(T.t)),d:`Blank target = not doing`},
+      {l:"Savings vs quotes",v:fmt(gross(T.s)),d:T.q?`${(T.s/T.q*100).toFixed(1)}% off quoted${tax}`:"Add quotes to track",hero:true,cls:T.s>0?"good":""},
+      {l:"Projected + contingency",v:fmt(need),d:`${fmt(gross(T.pr))} projected + ${fmt(gross(cont))} reserve`},
+      {l:budget?(head>=0?"Headroom":"Over budget"):"Headroom",v:budget?fmt(Math.abs(head)):"—",d:budget?(head>=0?"Left after contingency":"Cut scope or negotiate"):"Needs a budget",cls:budget?(head>=0?"good":"bad"):""},
+      {l:"Not doing",v:fmt(gross(T.cut+T.cancelled)),d:(T.nCut+T.nCancel)?`${T.nCut+T.nCancel} line${T.nCut+T.nCancel>1?"s":""} cancelled (blank target or unticked)`:"Clear a target to cancel a line",cls:(T.cut+T.cancelled)?"good":""},
+      {l:"Paid to date",v:fmt(T.p),d:T.committed?`${fmt(Math.max(0,gross(T.committed)-T.p))} still owed on committed work`:"Nothing committed yet"},
+    ];
+    $("kpis").innerHTML=k.map(x=>`<div class="kpi${x.hero?" hero":""}"><span class="label">${x.l}</span><span class="v ${x.cls||""}" title="${esc(x.v)}">${x.v}</span><span class="d">${x.d}</span>${x.meter!=null?`<div class="meter"><span class="${x.over?"over":""}" style="width:${x.meter}%"></span></div>`:""}</div>`).join("");
+  }
+
+  function renderGroups(el,key){
+    const g={};items.forEach(i=>{const k=(i[key]||"Uncategorized").trim()||"Uncategorized";(g[k]=g[k]||[]).push(i)});
+    const rows=Object.entries(g).map(([k,l])=>({k,T:totals(l)})).filter(r=>r.T.q||r.T.t||r.T.a).sort((a,b)=>b.T.q-a.T.q);
+    if(!rows.length){el.innerHTML=`<div class="empty">Bars appear once line items have amounts.</div>`;return}
+    const max=Math.max(...rows.map(r=>Math.max(r.T.q,r.T.t,r.T.a)))||1;
+    el.innerHTML=rows.map(r=>`<div class="cat"><span class="n" title="${esc(r.k)}">${key==="category"?catIcon(r.k):""}${esc(r.k)}</span><div class="bars">
+      <div class="bar q" style="width:${r.T.q/max*100}%"></div><div class="bar t" style="width:${r.T.t/max*100}%"></div><div class="bar a" style="width:${r.T.a/max*100}%"></div></div>
+      <span class="s num">${fmt(r.T.q)}${r.T.s>0?`<br><span style="color:var(--good)">−${fmt(r.T.s).slice(1)}</span>`:""}</span></div>`).join("");
+  }
+
+  function renderChips(){return;
+    const trades=["All",...[...new Set(items.map(i=>(i.trade||"").trim()).filter(Boolean))].sort()];
+    if(!trades.includes(filter))filter="All";
+    $("chips").innerHTML=trades.map(t=>`<button type="button" class="chip" aria-pressed="${t===filter}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
+  }
+
+  const ICONS=[
+    [/floor|hardwood/i,'<path d="M3 3h18v18H3z"/><path d="M3 9h9M12 15h9M9 3v6M15 9v6M9 15v6"/>'],
+    [/ceiling|paint/i,'<rect x="3" y="3" width="14" height="6" rx="1"/><path d="M17 6h3v5h-8v3"/><rect x="10" y="14" width="4" height="7" rx="1"/>'],
+    [/trim|mill|wainscot|baseboard/i,'<path d="M3 21h18M3 17h18M5 17V7h14v10M9 7v10M15 7v10"/>'],
+    [/stair/i,'<path d="M3 21h5v-5h5v-5h5V6h3"/>'],
+    [/powder|bath|toilet/i,'<path d="M5 12h14v2a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z"/><path d="M8 19l-1 2M16 19l1 2M7 12V5a2 2 0 0 1 4 0"/>'],
+    [/tile/i,'<rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/>'],
+    [/electric|light/i,'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>'],
+    [/kitchen|cabinet/i,'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18M12 10v10M8 7h2M14 7h2"/>'],
+    [/struct|beam|wall/i,'<path d="M3 5h18M3 19h18M8 5v14M16 5v14"/><path d="M3 5v3h18V5M3 19v-3h18v3"/>'],
+    [/exterior|door|window/i,'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 3v18M10 12h0M14 12h0"/>'],
+    [/permit|design/i,'<path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h6"/>'],
+  ];
+  function catIcon(c){
+    const m=ICONS.find(([re])=>re.test(c||""));
+    const body=m?m[1]:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>';
+    return `<svg class="cicon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+  }
+  function diffInput(i,ro){
+    if(isCancel(i))return `<td class="diff m-diff" data-l="Difference"><input id="f-${i.id}-diff" class="dbox din cancel" data-f="diff" inputmode="decimal" value="" placeholder="✕ Not doing" title="Cancelled: blank target. Type an amount here, or a target, to bring it back." aria-label="Not doing. Type an amount to restore"${ro}></td>`;
+    const q=num(i.quoted), t=num(i.target)||q, d=q?t-q:0;
+    const cls=d<0?"good":d>0?"bad":"zero";
+    const val=d?(d<0?"-":"+")+Math.abs(Math.round(d)):"";
+    return `<td class="diff m-diff" data-l="Difference"><input id="f-${i.id}-diff" class="dbox din ${cls}" data-f="diff" inputmode="decimal" value="${val}" placeholder="$0" title="Type an amount off his quote, e.g. 350 or -350. Use +350 to go above it." aria-label="Difference from quote"${q?"":" disabled"}${ro}></td>`;
+  }
+  function diffCell(q,t){
+    const d=q&&t?t-q:0;
+    const cls=d<0?"good":d>0?"bad":"zero";
+    const txt=d?(d<0?"−":"+")+"$"+Math.abs(Math.round(d)).toLocaleString("en-CA"):"$0";
+    return `<td class="diff"><span class="dbox ${cls}" title="Target minus quoted">${q?txt:"—"}</span></td>`;
+  }
+  function fairCell(i){
+    const lo=num(i.fairLow), hi=num(i.fairHigh), q=num(i.quoted);
+    if(!lo&&!hi)return `<td class="fair"><span class="fr-none">—</span></td>`;
+    let pill="",cls="neutral";
+    if(q){ if(q>hi){pill=`High +${fmt(q-hi).slice(1)}`;cls="bad"} else if(q<lo){pill="Below market";cls="warn"} else {pill="Fair";cls="good"} }
+    const span=(hi-lo)||1, pad=span*0.35, min=Math.max(0,lo-pad), max=hi+pad;
+    const pos=v=>Math.min(100,Math.max(0,(v-min)/(max-min)*100));
+    const dot=q?`<span class="fr-dot ${cls}" style="left:${pos(q)}%" title="Quoted ${fmt(q)}"></span>`:"";
+    const tg=num(i.target);const tdot=tg&&tg!==q?`<span class="fr-tick" style="left:${pos(tg)}%" title="Target ${fmt(tg)}"></span>`:"";
+    return `<td class="fair"><div class="fr-top"><span class="num">${fmt(lo)}–${fmt(hi).slice(1)}</span>${pill?`<span class="pill ${cls}">${pill}</span>`:""}</div>
+      <div class="fr-track"><span class="fr-band" style="left:${pos(lo)}%;width:${pos(hi)-pos(lo)}%"></span>${tdot}${dot}</div>
+      ${i.basis?`<div class="fr-basis">${esc(i.basis)}</div>`:""}</td>`;
+  }
+  const LBL={quoted:"Quoted",target:"Target",actual:"Actual",paid:"Paid"};
+  function rowHtml(i){
+    const s=sav(i), st=STATUSES.includes(i.status)?i.status:"Quoted", ro=canWrite?"":" disabled";
+    const over=num(i.actual)&&num(i.target)&&num(i.actual)>num(i.target);
+    const del=pendingDelete===i.id?`<div class="confirm"><button class="yes" data-act="yes" type="button">Delete</button><button data-act="no" type="button">Keep</button></div>`:`<button class="del" data-act="del" type="button" aria-label="Delete line"${ro}>×</button>`;
+    const inc=i.include!==false;
+    return `<tr data-id="${esc(i.id)}" class="${inc?"":"off"}${isCancel(i)?" cancel":""}">
+      <td class="in" data-l="In"><input type="checkbox" id="f-${i.id}-include" data-f="include" aria-label="Include in budget"${inc?" checked":""}${ro}></td>
+      <td class="m-trade" data-l="Section"><input id="f-${i.id}-trade" data-f="trade" value="${esc(i.trade)}" placeholder="GC"${ro}></td>
+      <td class="m-cat"><div class="catcell">${catIcon(i.category)}<input id="f-${i.id}-category" data-f="category" value="${esc(i.category)}" placeholder="Category"${ro}></div></td>
+      <td class="m-item"><input id="f-${i.id}-item" data-f="item" value="${esc(i.item)}" placeholder="Describe the scope"${ro}>${i.unit?`<div class="unitbar">
+        <span class="ul">Qty</span><button type="button" data-act="qmin" aria-label="One fewer"${ro}>−</button><input id="f-${i.id}-qty" class="u" data-f="qty" inputmode="numeric" value="${num(i.qty)}"${ro}><button type="button" data-act="qplus" aria-label="One more"${ro}>+</button>
+        <span class="ul">× quoted $</span><input id="f-${i.id}-unitQuoted" class="u" data-f="unitQuoted" inputmode="decimal" value="${num(i.unitQuoted)}"${ro}>
+        <span class="ul">· target $</span><button type="button" data-act="umin" aria-label="Lower price per unit"${ro}>−</button><input id="f-${i.id}-unitTarget" class="u" data-f="unitTarget" inputmode="decimal" value="${num(i.unitTarget)}"${ro}><button type="button" data-act="uplus" aria-label="Raise price per unit"${ro}>+</button><span class="ul">/ea</span></div>`:""}</td>
+      ${["quoted","target","actual","paid"].map(f=>{if(i.unit&&(f==="quoted"||f==="target")){const c=`<td class="calc m-${f}" data-l="${LBL[f]}">${fmt(num(i[f]))}</td>`;return f==="target"?c+diffCell(num(i.quoted),num(i.target)||num(i.quoted)):c}
+        const inp=`<input id="f-${i.id}-${f}" class="money" data-f="${f}" inputmode="decimal" value="${num(i[f])?num(i[f]):""}" placeholder="—"${ro}>`;
+        return f==="target"?`<td class="m-target" data-l="Target"><div class="adj"><button type="button" data-act="minus" aria-label="Lower target"${ro}>−</button>${inp}<button type="button" data-act="plus" aria-label="Raise target"${ro}>+</button></div></td>${diffInput(i,ro)}`:`<td class="m-${f}" data-l="${LBL[f]}">${inp}</td>`}).join("")}
+      <td class="m-status" data-l="Status"><select id="f-${i.id}-status" data-f="status"${ro}>${STATUSES.map(x=>`<option${x===st?" selected":""}>${x}</option>`).join("")}</select>${over?`<span class="pill bad" style="margin:0 8px 6px">Over target</span>`:""}</td>
+      <td class="m-notes" data-l="Notes"><input id="f-${i.id}-notes" data-f="notes" value="${esc(i.notes)}" placeholder="Notes"${ro}></td>
+      <td class="m-del">${del}</td></tr>`;
+  }
+
+  function renderTable(){
+    const list=items.filter(i=>filter==="All"||(i.trade||"").trim()===filter);
+    if(!list.length){$("rows").innerHTML=`<tr><td colspan="13" class="empty" style="padding:16px">${db?"No line items yet. Use “Add line”, or send me the quote and I’ll load it.":"Loading line items…"}</td></tr>`;return}
+    const groups={};list.forEach(i=>{const k=(i.trade||"Other").trim()||"Other";(groups[k]=groups[k]||[]).push(i)});
+    const rank=k=>{const x=SECTION_ORDER.indexOf(k);return x<0?SECTION_ORDER.length-1:x};
+    let h="";
+    Object.keys(groups).sort((a,b)=>rank(a)-rank(b)||a.localeCompare(b)).forEach(k=>{
+      const l=groups[k].sort((a,b)=>num(a.order)-num(b.order));const T=totals(l);
+      h+=`<tr class="sec"><td colspan="13"><span class="sec-t">${esc(SECTION_LABEL[k]||k)}</span><span class="sec-d">${esc(SECTION_DESC[k]||"")}</span></td></tr>`;
+      h+=l.map(rowHtml).join("");
+      h+=`<tr class="newsub"><td class="lbl" colspan="4">${esc(SECTION_LABEL[k]||k)} new subtotal <span class="ns-d">after your targets</span></td><td class="calc ns-was">was ${fmt(T.q)}</td><td class="calc ns-v">${fmt(T.t)}</td>${diffCell(T.q,T.t)}<td colspan="6"></td></tr>`;
+      h+=`<tr class="sub"><td class="lbl" colspan="4">${esc(SECTION_LABEL[k]||k)} subtotal</td><td class="calc">${fmt(T.q)}</td><td class="calc">${fmt(T.t)}</td>${diffCell(T.q,T.t)}<td class="calc">${T.a?fmt(T.a):"—"}</td><td class="calc">${T.p?fmt(T.p):"—"}</td><td colspan="3"></td></tr>`;
+    });
+    const T=totals(list);
+    h+=`<tr class="total"><td class="lbl calc" colspan="4" style="text-align:left;font-family:var(--display);font-size:15px">Grand total</td><td class="calc">${fmt(T.q)}</td><td class="calc">${fmt(T.t)}</td>${diffCell(T.q,T.t)}<td class="calc">${T.a?fmt(T.a):"—"}</td><td class="calc">${T.p?fmt(T.p):"—"}</td><td colspan="3"></td></tr>`;
+    $("rows").innerHTML=h;
+  }
+
+  function sortItems(){items.sort((a,b)=>(a.category||"zzz").localeCompare(b.category||"zzz")||num(a.order)-num(b.order))}
+  function renderAll(){sortItems();renderKpis();renderGroups($("cats"),"category");renderGroups($("trades"),"trade");renderChips();renderTable();renderSettings()}
+  function renderSettings(){
+    if(document.activeElement!==$("setBudget"))$("setBudget").value=num(settings.budget)||"";
+    if(document.activeElement!==$("setCont"))$("setCont").value=settings.contingencyPct??12;
+    if(document.activeElement!==$("setStep"))$("setStep").value=settings.step||100;
+    ["setBudget","setCont","setStep"].forEach(id=>$(id).disabled=!canWrite);
+    $("addBtn").disabled=!canWrite;
+  }
+
+  // ---- writes ----
+  const queues={};
+  function autoStatus(it){
+    const q=num(it.quoted); if(!q)return null;
+    const changed=isCancel(it)||num(it.target)!==q;
+    const st=it.status||"Quoted";
+    if(changed&&st==="Quoted")return "Negotiate";
+    if(!changed&&st==="Negotiate")return "Quoted";
+    return null;
+  }
+  function write(path,data,mode){
+    if(!db||!canWrite)return;
+    if(path.startsWith("items/")&&("target" in data||"quoted" in data)){const it=items.find(i=>"items/"+i.id===path);const ns=it&&autoStatus(it);if(ns){it.status=ns;data={...data,status:ns};const sel=$("f-"+it.id+"-status");if(sel)sel.value=ns}}
+    const q=queues[path]||Promise.resolve();
+    note("Saving…");
+    queues[path]=q.then(()=>mode==="update"?db.doc(path).update(data):db.doc(path).set(data)).then(()=>note("Saved")).catch(e=>{
+      if(e&&e.code==="invalid_argument"&&mode!=="update"){canWrite=false;renderAll();note("Wrong or missing edit passcode. Tap Unlock editing.",true)}
+      else note("Couldn't save. Check your connection and try again.",true)});
+  }
+  function saveSettings(){settings={...settings,budget:num($("setBudget").value),contingencyPct:num($("setCont").value),preTax:false,step:num($("setStep").value)||100};renderAll();write("config/settings",{budget:settings.budget,contingencyPct:settings.contingencyPct,preTax:settings.preTax,step:settings.step})}
+
+  $("setBudget").addEventListener("change",saveSettings);
+  $("setCont").addEventListener("change",saveSettings);
+  $("setStep").addEventListener("change",saveSettings);
+
+  function unitWrite(it){
+    it.quoted=num(it.qty)*num(it.unitQuoted); it.target=num(it.qty)*num(it.unitTarget);
+    const focusId=document.activeElement&&document.activeElement.id;
+    renderAll(); if(focusId&&$(focusId))$(focusId).focus();
+    write("items/"+it.id,{qty:num(it.qty),unitQuoted:num(it.unitQuoted),unitTarget:num(it.unitTarget),quoted:it.quoted,target:it.target},"update");
+  }
+  $("rows").addEventListener("input",e=>{
+    const el=e.target, f=el.dataset&&el.dataset.f; if(!f||!["diff","target"].includes(f))return;
+    const tr=el.closest("tr[data-id]"); const it=tr&&items.find(i=>i.id===tr.dataset.id); if(!it)return;
+    const raw=String(el.value).replace(/[$,\s]/g,"");
+    if(f==="diff"){const q=num(it.quoted); if(!q)return; if(raw===""||raw==="-"||raw==="+")return; let d=num(raw); if(!/^[+-]/.test(raw))d=-Math.abs(d); it.target=Math.max(0,q+d)}
+    else it[f]=num(raw);
+    const id=el.id, pos=el.selectionStart, val=el.value;
+    renderAll();
+    const n=$(id); if(n){n.value=val;n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}
+  });
+  $("rows").addEventListener("change",e=>{
+    const el=e.target, tr=el.closest("tr[data-id]"); if(!tr||!el.dataset.f)return;
+    const it=items.find(i=>i.id===tr.dataset.id); if(!it)return;
+    const f=el.dataset.f; let v=el.type==="checkbox"?el.checked:el.value;
+    if(f==="diff"){
+      const raw=String(v).replace(/[$,\s]/g,""); const q=num(it.quoted); if(!q)return;
+      let d=raw===""?0:num(raw); if(raw!==""&&!/^[+-]/.test(raw))d=-Math.abs(d);
+      const t=Math.max(0,q+d);
+      it.target=t; renderAll(); const n=$("f-"+it.id+"-diff"); if(n&&document.activeElement===el)n.focus();
+      write("items/"+it.id,{target:t},"update"); return}
+    if(["quoted","target","actual","paid","qty","unitQuoted","unitTarget"].includes(f)){v=num(String(v).replace(/[$,\s]/g,""))}
+    if(it[f]===v&&f!=="target")return;
+    const prev=it[f]; it[f]=v;
+    if(it.unit&&["qty","unitQuoted","unitTarget"].includes(f)){unitWrite(it);return}
+    if(f==="quoted"&&v&&!num(it.target)&&!num(prev)){it.target=v;const fid=document.activeElement&&document.activeElement.id;renderAll();if(fid&&$(fid))$(fid).focus();write("items/"+it.id,{quoted:v,target:v},"update");return}
+    const focusId=document.activeElement&&document.activeElement.id;
+    renderAll();
+    if(focusId&&$(focusId))$(focusId).focus();
+    write("items/"+it.id,{[f]:v},"update");
+  });
+  $("rows").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-act]"); if(!b)return;
+    const id=b.closest("tr").dataset.id;
+    if(["qmin","qplus","umin","uplus"].includes(b.dataset.act)){
+      const it=items.find(i=>i.id===id); if(!it||!canWrite)return;
+      const a=b.dataset.act;
+      if(a==="qmin")it.qty=Math.max(0,num(it.qty)-1); if(a==="qplus")it.qty=num(it.qty)+1;
+      if(a==="umin")it.unitTarget=Math.max(0,num(it.unitTarget)-5); if(a==="uplus")it.unitTarget=num(it.unitTarget)+5;
+      unitWrite(it); const nb=document.querySelector(`tr[data-id="${id}"] button[data-act="${a}"]`); if(nb)nb.focus(); return}
+    if(b.dataset.act==="minus"||b.dataset.act==="plus"){
+      const it=items.find(i=>i.id===id); if(!it||!canWrite)return;
+      const step=num(settings.step)||100, base=num(it.target)||num(it.quoted);
+      const v=Math.max(0,base+(b.dataset.act==="plus"?step:-step));
+      it.target=v; renderAll(); const nb=document.querySelector(`tr[data-id="${id}"] button[data-act="${b.dataset.act}"]`); if(nb)nb.focus();
+      write("items/"+id,{target:v},"update"); return}
+    if(b.dataset.act==="del"){pendingDelete=id;renderTable()}
+    else if(b.dataset.act==="no"){pendingDelete=null;renderTable()}
+    else if(b.dataset.act==="yes"){pendingDelete=null;items=items.filter(i=>i.id!==id);renderAll();
+      if(db)db.doc("items/"+id).delete().then(()=>note("Deleted")).catch(()=>note("Couldn't delete. Try again.",true))}
+  });
+  $("addBtn").addEventListener("click",async()=>{
+    if(!db||!canWrite)return;
+    const ref=db.collection("items").doc();
+    const it={trade:filter==="All"?"":filter,category:"",item:"",quoted:0,target:0,actual:0,paid:0,status:"Quoted",notes:"",order:Date.now()};
+    items.push({id:ref.id,...it});renderAll();
+    const el=$("f-"+ref.id+"-category"); if(el)el.focus();
+    note("Saving…");
+    try{await ref.set(it);note("Saved")}catch(e){note("Couldn't add the line. Try again.",true)}
+  });
+
+  // ---- CSV export ----
+  async function setupCsv(){
+    const dl=await claude.use("downloads"); if(!dl)return;
+    const btn=$("csvBtn"); btn.hidden=false;
+    btn.addEventListener("click",async()=>{
+      const cols=["trade","category","item","quoted","target","actual","paid","status","notes"];
+      const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+      const csv=[cols.join(","),...items.map(i=>cols.map(c=>q(i[c])).join(","))].join("\n");
+      try{await dl.save({filename:"reno-budget.csv",data:new Blob([csv],{type:"text/csv"})})}catch(e){}
+    });
+  }
+
+
+  // ---- blueprint ----
+  (function(){
+    const S=[{f:"blueprint/s2-proposed-ground.jpg",c:"S2",t:"Proposed ground floor",d:"Wall removal, W8x18 dropped beam (17 ft span), new island, 10 ft patio door"},{f:"blueprint/s1-proposed-basement.jpg",c:"S1",t:"Proposed basement",d:"New post on existing pad footing, to be confirmed on site"},{f:"blueprint/ex2-existing-ground.jpg",c:"EX2",t:"Existing ground floor",d:"Kitchen, pantry and family room before the wall comes out"},{f:"blueprint/ex1-existing-basement.jpg",c:"EX1",t:"Existing basement",d:"Existing beams, posts, rec rooms"},{f:"blueprint/ex3-existing-second.jpg",c:"EX3",t:"Existing second floor",d:"No work shown on the drawings"},{f:"blueprint/gn-general-notes.jpg",c:"GN",t:"General notes",d:"Wall types, door schedule, OBC notes"}];
+    const view=$("bpView"), img=$("bpImg");
+    function show(i){const x=S[i];img.src=x.f;img.alt=x.c+" "+x.t;$("bpDesc").textContent=x.c+" · "+x.d;$("bpOpen").href=x.f;view.classList.remove("zoom");
+      document.querySelectorAll(".bp-tab").forEach(b=>b.setAttribute("aria-selected",String(+b.dataset.i===i)))}
+    document.querySelector(".bp-tabs").addEventListener("click",e=>{const b=e.target.closest(".bp-tab");if(b)show(+b.dataset.i)});
+    view.addEventListener("click",e=>{const r=view.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width,fy=(e.clientY-r.top)/r.height;const z=view.classList.toggle("zoom");
+      if(z){requestAnimationFrame(()=>{view.scrollLeft=fx*view.scrollWidth-view.clientWidth/2;view.scrollTop=fy*view.scrollHeight-view.clientHeight/2})}});
+    show(0);
+  })();
+
+  // ---- edit passcode ----
+  (function(){
+    const L=window.renoLive||{}; const msg=$("lockMsg");
+    if(!L.configured){msg.textContent="Database not connected yet: add your Supabase keys to config.js";msg.classList.add("err");return}
+    const has=!!L.getPin();
+    msg.textContent=has?"Editing unlocked on this device":"View only";
+    $("lockBtn").hidden=has; $("lockOut").hidden=!has;
+    $("lockBtn").addEventListener("click",()=>{$("lockBtn").hidden=true;$("lockForm").hidden=false;$("lockPin").focus()});
+    $("lockOut").addEventListener("click",()=>{L.clearPin();location.reload()});
+    $("lockForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("lockPin").value.trim();if(!p)return;
+      msg.textContent="Checking…";msg.classList.remove("err");
+      try{if(await L.checkPin(p)){L.setPin(p);location.reload()}else{msg.textContent="That passcode didn't match. Try again.";msg.classList.add("err")}}
+      catch(err){msg.textContent="Couldn't reach the database. Check your connection.";msg.classList.add("err")}});
+  })();
+  // ---- boot ----
+  renderAll();
+  (async()=>{
+    if(!window.claude||!claude.use){note("Database not connected.",true);return}
+    const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!d){note("Database not connected yet. See README.",true);return}
+    db=d;
+    if(u&&u.can){try{const w=await u.can("data.write");if(w===false)canWrite=false}catch(e){}}
+    let gotItems=false;
+    const timer=setTimeout(()=>{if(!gotItems)note("Can't reach your saved data yet. Retrying…",true)},10000);
+    db.collection("items").onSnapshot(s=>{
+      items=s.docs.map(x=>({id:x.id,...x.data()}));
+      if(!s.metadata.fromCache){gotItems=true;clearTimeout(timer);if(!s.metadata.hasPendingWrites)note(canWrite?"All changes saved · live":"View only · live")}
+      const a=document.activeElement, aid=a&&a.id&&a.id.startsWith("f-")?a.id:null, val=aid?a.value:null;
+      renderAll();
+      if(aid&&$(aid)){$(aid).value=val;$(aid).focus()}
+    },e=>{clearTimeout(timer);note("Lost connection to your saved data. Reload the page to reconnect.",true)});
+    db.doc("config/settings").onSnapshot(s=>{if(s.exists){settings={...settings,...s.data()};renderAll()}},()=>{});
+    setupCsv();
+  })();
+})();
+</script>
+
+</body>
+</html>
