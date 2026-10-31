@@ -140,6 +140,8 @@ tr.total td{background:var(--lumber-soft);font-weight:700}
 .cicon{width:16px;height:16px;flex:none;color:var(--accent)}
 .cat .n .cicon{vertical-align:-3px;margin-right:6px}
 .unitbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:0 8px 8px;font-size:12px}
+.each{display:flex;align-items:center}.each .ea{font-size:11px;color:var(--muted);padding-right:8px}
+.ext{font-size:11px;color:var(--muted);font-family:var(--mono);padding:0 8px 6px;text-align:right;white-space:nowrap}.ext b{color:var(--ink,inherit);font-weight:600}
 .unitbar .ul{color:var(--muted)}
 .unitbar input.u{width:48px;padding:4px 6px;font-family:var(--mono);text-align:center;border:1px solid var(--line);background:var(--bg)}
 .unitbar button{font:inherit;font-weight:700;width:22px;height:24px;border:1px solid var(--line);background:var(--bg);color:var(--accent);border-radius:4px;cursor:pointer;padding:0}
@@ -174,6 +176,7 @@ tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoratio
 @media (prefers-reduced-motion:no-preference){.meter span,.bar{transition:width .3s ease}}
 
 @media (max-width:760px){
+  .ext{text-align:left;padding:4px 0 0;white-space:normal}.each .ea{padding-left:6px}
   .wrap{gap:16px;padding-block:12px 40px}
   .brand-s{letter-spacing:.08em}
   .brand-job{width:100%}
@@ -492,11 +495,9 @@ tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoratio
       <td class="in" data-l="In"><input type="checkbox" id="f-${i.id}-include" data-f="include" aria-label="Include in budget"${inc?" checked":""}${ro}></td>
       <td class="m-trade" data-l="Section"><input id="f-${i.id}-trade" data-f="trade" value="${esc(i.trade)}" placeholder="GC"${ro}></td>
       <td class="m-cat"><div class="catcell">${catIcon(i.category)}<input id="f-${i.id}-category" data-f="category" value="${esc(i.category)}" placeholder="Category"${ro}></div></td>
-      <td class="m-item"><input id="f-${i.id}-item" data-f="item" value="${esc(i.item)}" placeholder="Describe the scope"${ro}>${i.unit?`<div class="unitbar">
-        <span class="ul">Qty</span><button type="button" data-act="qmin" aria-label="One fewer"${ro}>−</button><input id="f-${i.id}-qty" class="u" data-f="qty" inputmode="numeric" value="${num(i.qty)}"${ro}><button type="button" data-act="qplus" aria-label="One more"${ro}>+</button>
-        <span class="ul">× quoted $</span><input id="f-${i.id}-unitQuoted" class="u" data-f="unitQuoted" inputmode="decimal" value="${num(i.unitQuoted)}"${ro}>
-        <span class="ul">· target $</span><button type="button" data-act="umin" aria-label="Lower price per unit"${ro}>−</button><input id="f-${i.id}-unitTarget" class="u" data-f="unitTarget" inputmode="decimal" value="${num(i.unitTarget)}"${ro}><button type="button" data-act="uplus" aria-label="Raise price per unit"${ro}>+</button><span class="ul">/ea</span></div>`:""}</td>
-      ${["quoted","target","actual","paid"].map(f=>{if(i.unit&&(f==="quoted"||f==="target")){const c=`<td class="calc m-${f}" data-l="${LBL[f]}">${fmt(num(i[f]))}</td>`;return f==="target"?c+diffCell(num(i.quoted),num(i.target)||num(i.quoted)):c}
+      <td class="m-item"><input id="f-${i.id}-item" data-f="item" value="${esc(i.item)}" placeholder="Describe the scope"${ro}>${i.unit?`<div class="unitbar"><span class="ul">How many</span><button type="button" data-act="qmin" aria-label="One fewer"${ro}>−</button><input id="f-${i.id}-qty" class="u" data-f="qty" inputmode="numeric" value="${num(i.qty)}"${ro}><button type="button" data-act="qplus" aria-label="One more"${ro}>+</button></div>`:""}</td>
+      ${["quoted","target","actual","paid"].map(f=>{if(i.unit&&f==="quoted")return `<td class="m-quoted" data-l="Quoted"><div class="each"><input id="f-${i.id}-unitQuoted" class="money" data-f="unitQuoted" inputmode="decimal" value="${num(i.unitQuoted)}"${ro}><span class="ea">each</span></div><div class="ext">${num(i.qty)} × $${num(i.unitQuoted)} = <b>${fmt(num(i.quoted))}</b></div></td>`;
+        if(i.unit&&f==="target")return `<td class="m-target" data-l="Target"><div class="adj"><button type="button" data-act="umin" aria-label="Lower price per light by $5"${ro}>−</button><input id="f-${i.id}-unitTarget" class="money" data-f="unitTarget" inputmode="decimal" value="${num(i.unitTarget)}"${ro}><button type="button" data-act="uplus" aria-label="Raise price per light by $5"${ro}>+</button></div><div class="ext">each · ${num(i.qty)} × $${num(i.unitTarget)} = <b>${fmt(num(i.target))}</b></div></td>`+diffCell(num(i.quoted),num(i.target)||num(i.quoted));
         const inp=`<input id="f-${i.id}-${f}" class="money" data-f="${f}" inputmode="decimal" value="${num(i[f])?num(i[f]):""}" placeholder="—"${ro}>`;
         return f==="target"?`<td class="m-target" data-l="Target"><div class="adj"><button type="button" data-act="minus" aria-label="Lower target"${ro}>−</button>${inp}<button type="button" data-act="plus" aria-label="Raise target"${ro}>+</button></div></td>${diffInput(i,ro)}`:`<td class="m-${f}" data-l="${LBL[f]}">${inp}</td>`}).join("")}
       <td class="m-status" data-l="Status"><select id="f-${i.id}-status" data-f="status"${ro}>${STATUSES.map(x=>`<option${x===st?" selected":""}>${x}</option>`).join("")}</select>${over?`<span class="pill bad" style="margin:0 8px 6px">Over target</span>`:""}</td>
