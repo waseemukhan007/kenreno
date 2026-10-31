@@ -452,7 +452,7 @@ tr.off td{opacity:.45} tr.off td.in{opacity:1} tr.off input.money{text-decoratio
       const T=totals(L);
       const live=L.filter(i=>i.include!==false&&!isCancel(i));
       const unpriced=live.filter(i=>!num(i.quoted)&&!num(i.target)&&!num(i.actual)).length;
-      const cnt=s=>live.filter(i=>(i.status||"Quoted")===s).length;
+      const cnt=s=>live.filter(i=>(num(i.quoted)||num(i.target)||num(i.actual))&&(i.status||"Quoted")===s).length;
       const share=Math.round(T.t/allT*100);
       const pills=[["Agreed","good"],["Negotiate","warn"],["In progress","warn"],["Done","good"],["Quoted","neutral"]].map(([s,c])=>{const n=cnt(s);return n?`<span class="pill ${c}">${n} ${s.toLowerCase()}</span>`:""}).join("");
       const open=k==="Not quoted yet"||(!T.q&&!T.t);
