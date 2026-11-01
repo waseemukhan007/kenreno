@@ -1,6 +1,7 @@
 # Force https
 RewriteEngine On
 RewriteCond %{HTTPS} !=on
+RewriteCond %{REQUEST_URI} !^/\.well-known/
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # Never serve git files or the readme
 RedirectMatch 404 /\.git
