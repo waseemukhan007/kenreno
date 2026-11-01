@@ -1,0 +1,20 @@
+# Force https
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Never serve git files or the readme
+RedirectMatch 404 /\.git
+RedirectMatch 404 /README\.md$
+# Security headers
+<IfModule mod_headers.c>
+Header always set Strict-Transport-Security "max-age=31536000"
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+# Always fetch fresh pages so updates show right away
+<FilesMatch "\.(html|js)$">
+<IfModule mod_headers.c>
+Header set Cache-Control "no-cache"
+</IfModule>
+</FilesMatch>
